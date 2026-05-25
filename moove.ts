@@ -4,6 +4,21 @@
 // ============================================================
 
 // ─────────────────────────────────────────────
+//  HELPER — output su pagina e console
+// ─────────────────────────────────────────────
+
+function log(msg: string): void {
+  console.log(msg);
+  const div = document.getElementById("output");
+  if (div) {
+    const p = document.createElement("div");
+    p.className = "log";
+    p.textContent = msg;
+    div.appendChild(p);
+  }
+}
+
+// ─────────────────────────────────────────────
 //  ENUMS
 // ─────────────────────────────────────────────
 
@@ -68,16 +83,12 @@ class Mezzo implements IMezzo {
 
   assegnaUtente(utente: IUtente): void {
     if (this.stato === StatoMezzo.InUso) {
-      console.log(
-        `❌ Il mezzo [${this.id}] (${this.tipo}) è già in uso e non può essere assegnato.`
-      );
+      log(`❌ Il mezzo [${this.id}] (${this.tipo}) è già in uso e non può essere assegnato.`);
       return;
     }
     this.utente = utente;
     this.stato = StatoMezzo.InUso;
-    console.log(
-      `✅ Mezzo [${this.id}] (${this.tipo}) assegnato a ${utente.nome} ${utente.cognome}.`
-    );
+    log(`✅ Mezzo [${this.id}] (${this.tipo}) assegnato a ${utente.nome} ${utente.cognome}.`);
   }
 }
 
@@ -102,22 +113,16 @@ class Utente implements IUtente {
 
   prenotaMezzo(mezzo: IMezzo): void {
     if (mezzo.stato === StatoMezzo.InUso) {
-      console.log(
-        `❌ ${this.nome} ${this.cognome} non può prenotare il mezzo [${mezzo.id}]: già in uso.`
-      );
+      log(`❌ ${this.nome} ${this.cognome} non può prenotare il mezzo [${mezzo.id}]: già in uso.`);
       return;
     }
     if (this.mezzoPrenotato !== null) {
-      console.log(
-        `⚠️  ${this.nome} ${this.cognome} ha già un mezzo prenotato ([${this.mezzoPrenotato.id}]).`
-      );
+      log(`⚠️  ${this.nome} ${this.cognome} ha già un mezzo prenotato ([${this.mezzoPrenotato.id}]).`);
       return;
     }
     this.mezzoPrenotato = mezzo;
     mezzo.assegnaUtente(this);
-    console.log(
-      `💳 Pagamento tramite ${this.metodoPagamentoPreferito} confermato.`
-    );
+    log(`💳 Pagamento tramite ${this.metodoPagamentoPreferito} confermato.`);
   }
 }
 
@@ -132,25 +137,21 @@ class Citta implements ICitta {
 
   aggiungiMezzo(mezzo: IMezzo): void {
     this.mezziDisponibili.push(mezzo);
-    console.log(
-      `🏙️  Mezzo [${mezzo.id}] (${mezzo.tipo}) aggiunto alla città di ${this.nome}.`
-    );
+    log(`🏙️  Mezzo [${mezzo.id}] (${mezzo.tipo}) aggiunto alla città di ${this.nome}.`);
   }
 
   mostraFlotta(): void {
-    console.log(`\n📍 Flotta di ${this.nome}:`);
+    log(`📍 Flotta di ${this.nome}:`);
     if (this.mezziDisponibili.length === 0) {
-      console.log("   Nessun mezzo registrato.");
+      log("   Nessun mezzo registrato.");
       return;
     }
     this.mezziDisponibili.forEach((m) => {
       const icona =
-        m.tipo === TipoMezzo.Bici
-          ? "🚲"
-          : m.tipo === TipoMezzo.Scooter
-          ? "🛵"
-          : "🛴";
-      console.log(`   ${icona} [${m.id}] ${m.tipo} — ${m.stato}`);
+        m.tipo === TipoMezzo.Bici ? "🚲"
+        : m.tipo === TipoMezzo.Scooter ? "🛵"
+        : "🛴";
+      log(`   ${icona} [${m.id}] ${m.tipo} — ${m.stato}`);
     });
   }
 }
@@ -159,7 +160,7 @@ class Citta implements ICitta {
 //  TEST — Istanziazione e logica
 // ─────────────────────────────────────────────
 
-console.log("=== MOOVE — Sistema di Micro Mobilità Condivisa ===\n");
+log("=== MOOVE — Sistema di Micro Mobilità Condivisa ===");
 
 // Mezzi
 const bici1 = new Mezzo(TipoMezzo.Bici, "BICI-001");
@@ -169,54 +170,39 @@ const monopattino1 = new Mezzo(TipoMezzo.Monopattino, "MONO-001");
 const monopattino2 = new Mezzo(TipoMezzo.Monopattino, "MONO-002");
 
 // Utenti
-const alice = new Utente(
-  "Alice",
-  "Bianchi",
-  "alice.bianchi@email.com",
-  MetodoPagamento.ApplePay
-);
-const marco = new Utente(
-  "Marco",
-  "Rossi",
-  "marco.rossi@email.com",
-  MetodoPagamento.PayPal
-);
-const giulia = new Utente(
-  "Giulia",
-  "Verdi",
-  "giulia.verdi@email.com",
-  MetodoPagamento.CartaCredito
-);
+const alice = new Utente("Alice", "Bianchi", "alice.bianchi@email.com", MetodoPagamento.ApplePay);
+const marco = new Utente("Marco", "Rossi", "marco.rossi@email.com", MetodoPagamento.PayPal);
+const giulia = new Utente("Giulia", "Verdi", "giulia.verdi@email.com", MetodoPagamento.CartaCredito);
 
 // Città
 const milano = new Citta("Milano");
 const roma = new Citta("Roma");
 
-// Aggiunta mezzi alle città
-console.log("── Aggiunta mezzi alle città ──");
+// Aggiunta mezzi
+log("── Aggiunta mezzi alle città ──");
 milano.aggiungiMezzo(bici1);
 milano.aggiungiMezzo(bici2);
 milano.aggiungiMezzo(scooter1);
 roma.aggiungiMezzo(monopattino1);
 roma.aggiungiMezzo(monopattino2);
 
-// Stato iniziale flotte
+// Flotta iniziale
+log("── Stato iniziale flotte ──");
 milano.mostraFlotta();
 roma.mostraFlotta();
 
 // Prenotazioni
-console.log("\n── Prenotazioni ──");
+log("── Prenotazioni ──");
 alice.prenotaMezzo(bici1);
 marco.prenotaMezzo(scooter1);
 giulia.prenotaMezzo(monopattino1);
 
 // Casi limite
-console.log("\n── Casi limite ──");
-// Mezzo già in uso
+log("── Casi limite ──");
 marco.prenotaMezzo(bici1);
-// Utente con mezzo già prenotato
 alice.prenotaMezzo(bici2);
 
-// Stato finale flotte
+// Flotta finale
+log("── Stato finale flotte ──");
 milano.mostraFlotta();
 roma.mostraFlotta();
