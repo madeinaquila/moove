@@ -10,6 +10,22 @@ Il progetto implementa un sistema che gestisce le interazioni tra **utenti**, **
 
 ---
 
+## 📁 Struttura del repository
+
+```
+moove/
+├── src/
+│   └── moove.ts        # codice sorgente TypeScript
+├── dist/                # output compilato (generato, non versionato)
+├── tsconfig.json
+├── package.json
+└── README.md
+```
+
+Il sorgente vive in `src/`, l'output compilato in `dist/`. La cartella `dist/` e `node_modules/` sono escluse dal repository tramite `.gitignore`, perché sono entrambe rigenerabili: la prima con `npx tsc`, la seconda con `npm install`.
+
+---
+
 ## 🏗️ Struttura del codice
 
 ### Enums
@@ -34,6 +50,7 @@ Il progetto implementa un sistema che gestisce le interazioni tra **utenti**, **
 ## ⚙️ Logica di funzionamento
 
 - `Mezzo.assegnaUtente()` — assegna il mezzo a un utente e imposta lo stato su `in uso`. Blocca l'assegnazione se il mezzo è già occupato.
+- `Mezzo.getUtenteAssegnato()` — restituisce l'utente attualmente assegnato al mezzo, se presente.
 - `Utente.prenotaMezzo()` — permette all'utente di prenotare un mezzo disponibile. Impedisce prenotazioni multiple e mezzi già in uso.
 - `Citta.aggiungiMezzo()` — aggiunge nuovi mezzi alla flotta della città.
 - `Citta.mostraFlotta()` — mostra lo stato aggiornato di tutti i mezzi della città.
@@ -44,7 +61,7 @@ Il progetto implementa un sistema che gestisce le interazioni tra **utenti**, **
 
 ### Prerequisiti
 - [Node.js](https://nodejs.org/) installato
-- [TypeScript](https://www.typescriptlang.org/) installato
+- [TypeScript](https://www.typescriptlang.org/) (installato come dipendenza di progetto)
 
 ### Installazione
 
@@ -57,9 +74,11 @@ npm install
 ### Compilazione ed esecuzione
 
 ```bash
-npx tsc --ignoreConfig moove.ts
-node moove.js
+npx tsc
+node dist/moove.js
 ```
+
+Il comando `npx tsc` legge automaticamente `tsconfig.json`, compila tutto ciò che trova in `src/` e scrive l'output in `dist/`.
 
 ---
 
@@ -77,8 +96,11 @@ node moove.js
 
 ── Prenotazioni ──
 ✅ Mezzo [BICI-001] assegnato a Alice Bianchi.
+💳 Pagamento tramite Apple Pay confermato.
 ✅ Mezzo [SCO-001] assegnato a Marco Rossi.
+💳 Pagamento tramite PayPal confermato.
 ✅ Mezzo [MONO-001] assegnato a Giulia Verdi.
+💳 Pagamento tramite carta di credito confermato.
 
 ── Casi limite ──
 ❌ Marco Rossi non può prenotare il mezzo [BICI-001]: già in uso.
@@ -102,9 +124,15 @@ node moove.js
 
 **Interfacce** — definiscono i contratti tra i componenti del sistema, rendendo il codice modulare e facilmente estendibile.
 
-**Incapsulamento** — le proprietà sensibili come `utente` e `mezzoPrenotato` sono dichiarate `private` nelle classi, esponendo solo i metodi necessari.
+**Incapsulamento** — le proprietà sensibili come `utente` e `mezzoPrenotato` sono dichiarate `private` nelle classi, esponendo solo i metodi necessari (es. `getUtenteAssegnato()`).
 
 **Gestione degli stati** — ogni operazione di prenotazione verifica lo stato del mezzo e dell'utente prima di procedere, prevenendo inconsistenze nei dati.
+
+**Separazione sorgente/output** — `tsconfig.json` è configurato con `rootDir: "./src"` e `outDir: "./dist"`, così il codice scritto a mano e il codice generato dal compilatore non si mescolano mai nella stessa cartella.
+
+**Controlli di tipo rigorosi** — `tsconfig.json` abilita `strict`, `noUnusedLocals` e `noUnusedParameters`, per intercettare a compile-time variabili dichiarate ma mai usate o parametri inutilizzati.
+
+**Output ambientale-agnostico** — la funzione `log()` scrive sempre in console (utile in Node.js) e, solo se `document` è disponibile (cioè in un browser, come su CodePen), scrive anche sulla pagina. Questo permette di eseguire lo stesso identico file sia da terminale che in un ambiente browser.
 
 ---
 
@@ -117,5 +145,6 @@ node moove.js
 
 ## 👤 Autore
 
-**Valerio Aquilani** — [GitHub](https://github.com/madeinaquila)# moove
-Sistema di micro mobilità condivisa in TypeScript
+**Valerio Aquilani**
+
+[GitHub](https://github.com/madeinaquila)
