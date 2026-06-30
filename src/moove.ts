@@ -4,17 +4,19 @@
 // ============================================================
 
 // ─────────────────────────────────────────────
-//  HELPER — output su pagina e console
+//  HELPER — output su pagina (browser) e console (sempre)
 // ─────────────────────────────────────────────
 
 function log(msg: string): void {
   console.log(msg);
-  const div = document.getElementById("output");
-  if (div) {
-    const p = document.createElement("div");
-    p.className = "log";
-    p.textContent = msg;
-    div.appendChild(p);
+  if (typeof document !== "undefined") {
+    const div = document.getElementById("output");
+    if (div) {
+      const p = document.createElement("div");
+      p.className = "log";
+      p.textContent = msg;
+      div.appendChild(p);
+    }
   }
 }
 
@@ -89,6 +91,10 @@ class Mezzo implements IMezzo {
     this.utente = utente;
     this.stato = StatoMezzo.InUso;
     log(`✅ Mezzo [${this.id}] (${this.tipo}) assegnato a ${utente.nome} ${utente.cognome}.`);
+  }
+
+  getUtenteAssegnato(): IUtente | null {
+    return this.utente;
   }
 }
 
@@ -196,6 +202,9 @@ log("── Prenotazioni ──");
 alice.prenotaMezzo(bici1);
 marco.prenotaMezzo(scooter1);
 giulia.prenotaMezzo(monopattino1);
+
+// Verifica utente assegnato (usa il nuovo metodo)
+log(`ℹ️  Il mezzo [${bici1.id}] risulta assegnato a: ${bici1.getUtenteAssegnato()?.nome ?? "nessuno"}`);
 
 // Casi limite
 log("── Casi limite ──");
